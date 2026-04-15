@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
+import { imageAssets } from "../constants/imageAssets";
 
 function Cart() {
   const [cart, setCart] = useState([]);
@@ -65,12 +66,15 @@ function Cart() {
   if (cart.length === 0) {
     return (
       <div className="sv-shell flex min-h-[70vh] items-center justify-center py-6">
-        <div className="sv-panel w-full max-w-lg p-8 text-center">
+        <div className="sv-panel w-full max-w-lg overflow-hidden text-center">
+          <img src={imageAssets.emptyCart} alt="Empty cart" className="h-48 w-full object-cover" />
+          <div className="p-8">
           <h2 className="font-display text-2xl font-extrabold text-ink">Your cart is empty</h2>
           <p className="mt-2 text-sm text-slate-600">Browse products and add your favorites to continue.</p>
           <button className="sv-btn-primary mt-5" onClick={() => navigate("/")}>
             Shop Now
           </button>
+          </div>
         </div>
       </div>
     );
@@ -89,8 +93,7 @@ function Cart() {
                   alt={item.name}
                   className="h-24 w-24 rounded-xl border border-slate-200 bg-slate-50 p-2 object-contain"
                   onError={(e) => {
-                    e.currentTarget.src =
-                      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80";
+                    e.currentTarget.src = imageAssets.fallbackCart;
                   }}
                 />
 

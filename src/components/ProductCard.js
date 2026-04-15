@@ -1,3 +1,5 @@
+import { imageAssets } from "../constants/imageAssets";
+
 function ProductCard({ product, onClick }) {
   const getOriginalPrice = (price) => Math.round(Number(price) * 1.25);
   const getDiscountPercent = (price) =>
@@ -14,8 +16,7 @@ function ProductCard({ product, onClick }) {
           alt={product.name}
           className="h-full w-full object-contain p-3 transition duration-300 group-hover:scale-105"
           onError={(e) => {
-            e.currentTarget.src =
-              "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80";
+            e.currentTarget.src = imageAssets.fallbackProduct;
           }}
         />
       </div>

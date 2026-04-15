@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
+import { imageAssets } from "../constants/imageAssets";
 
 function Profile() {
   const navigate = useNavigate();
@@ -22,15 +23,30 @@ function Profile() {
     );
   }
 
+  const displayName = profile?.fullName || "Shopper";
+  const displayInitial = displayName.trim().charAt(0).toUpperCase() || "U";
+
   return (
     <main className="sv-shell animate-floatIn py-5 md:py-7">
       <div className="grid gap-5 md:grid-cols-3">
-        <section className="sv-panel p-5">
+        <section className="sv-panel overflow-hidden">
+          <img src={imageAssets.profileCover} alt="Profile cover" className="h-28 w-full object-cover" />
+          <div className="p-5">
           <h2 className="font-display text-xl font-extrabold text-ink">My Profile</h2>
+          <div className="mt-4 flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandBlue text-lg font-extrabold text-white">
+              {displayInitial}
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">User</p>
+              <p className="font-bold text-ink">{displayName}</p>
+            </div>
+          </div>
           <p className="mt-4 text-xs font-bold uppercase tracking-wider text-slate-500">Name</p>
-          <p className="font-bold text-ink">{profile?.fullName || "Shopper"}</p>
+          <p className="font-bold text-ink">{displayName}</p>
           <p className="mt-4 text-xs font-bold uppercase tracking-wider text-slate-500">Email</p>
           <p className="font-bold text-ink">{profile?.email || "-"}</p>
+          </div>
         </section>
 
         <section className="sv-panel p-5 md:col-span-2">

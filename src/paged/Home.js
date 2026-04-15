@@ -4,6 +4,7 @@ import API from "../services/api";
 import ProductCard from "../components/ProductCard";
 import SkeletonCard from "../components/SkeletonCard";
 import useDebounce from "../hooks/useDebounce";
+import { imageAssets } from "../constants/imageAssets";
 
 function Home() {
   const [products, setProducts] = useState([]);
@@ -51,28 +52,32 @@ function Home() {
   return (
     <main className="sv-shell animate-floatIn py-5 md:py-7">
       <section className="mb-6 grid gap-4 lg:grid-cols-[1.3fr_1fr]">
-        <div className="sv-panel overflow-hidden bg-gradient-to-br from-brandBlue via-blue-700 to-cyan-500 p-6 text-white">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-100">Limited Edition</p>
-          <h1 className="mt-2 font-display text-3xl font-extrabold leading-tight md:text-4xl">
-            Upgrade Your Everyday Shopping
-          </h1>
-          <p className="mt-3 max-w-xl text-sm text-blue-100 md:text-base">
-            Discover handpicked products with honest pricing, quick checkout, and reliable delivery.
-          </p>
-          <button className="sv-btn mt-5 bg-white text-brandBlue hover:bg-blue-50" onClick={() => navigate("/cart")}>
-            Check Cart
-          </button>
+        <div className="sv-panel relative overflow-hidden text-white">
+          <img src={imageAssets.homeHero} alt="Shopping collection" className="h-full min-h-64 w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-brandBlue/50 to-transparent" />
+          <div className="absolute inset-0 p-6 md:p-7">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-100">Limited Edition</p>
+            <h1 className="mt-2 max-w-xl font-display text-3xl font-extrabold leading-tight md:text-4xl">
+              Upgrade Your Everyday Shopping
+            </h1>
+            <p className="mt-3 max-w-xl text-sm text-blue-100 md:text-base">
+              Discover handpicked products with honest pricing, quick checkout, and reliable delivery.
+            </p>
+            <button className="sv-btn mt-5 bg-white text-brandBlue hover:bg-blue-50" onClick={() => navigate("/cart")}>
+              Check Cart
+            </button>
+          </div>
         </div>
 
         <div className="sv-panel flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
           <img
-            src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1000&q=80"
+            src={imageAssets.homePromo}
             alt="Featured shopping"
             className="h-40 w-full rounded-2xl object-cover sm:h-28 sm:w-28"
           />
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">Today Only</p>
-            <h2 className="font-display text-xl font-extrabold text-ink">Save up to 40%</h2>
+            <h2 className="font-display text-xl font-extrabold text-ink">Save up to 20%</h2>
             <p className="mt-1 text-sm text-slate-600">Fast-moving deals across electronics, home, and fashion.</p>
           </div>
         </div>

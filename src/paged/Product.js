@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../services/api";
+import { imageAssets } from "../constants/imageAssets";
 
 function Product() {
   const { id } = useParams();
@@ -58,8 +59,8 @@ function Product() {
   const galleryImages =
     Array.isArray(product.image_urls) && product.image_urls.length > 0
       ? product.image_urls
-      : [product.image_url].filter(Boolean);
-  const activeImage = galleryImages[activeImageIndex] || product.image_url;
+      : [product.image_url, imageAssets.fallbackProduct].filter(Boolean);
+  const activeImage = galleryImages[activeImageIndex] || imageAssets.fallbackProduct;
   const specs =
     product.specifications && typeof product.specifications === "object"
       ? Object.entries(product.specifications)
@@ -97,8 +98,7 @@ function Product() {
               alt={product.name}
               className="h-80 object-contain"
               onError={(e) => {
-                e.currentTarget.src =
-                  "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80";
+                e.currentTarget.src = imageAssets.fallbackProduct;
               }}
             />
           </div>

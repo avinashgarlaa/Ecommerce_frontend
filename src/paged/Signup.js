@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import API from "../services/api";
+import { imageAssets } from "../constants/imageAssets";
 
 function Signup() {
   const navigate = useNavigate();
@@ -41,10 +42,14 @@ function Signup() {
   return (
     <main className="sv-shell flex min-h-[calc(100vh-170px)] items-center justify-center py-6">
       <div className="sv-panel grid w-full max-w-4xl overflow-hidden md:grid-cols-2">
-        <div className="bg-gradient-to-br from-brandBlue to-cyan-600 p-8 text-white">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-100">Join ShopVerse</p>
-          <h1 className="mt-2 font-display text-3xl font-extrabold">Create Account</h1>
-          <p className="mt-2 text-blue-100">Sign up once and checkout quickly anytime.</p>
+        <div className="relative min-h-52 overflow-hidden p-8 text-white">
+          <img src={imageAssets.authSignup} alt="Create account" className="absolute inset-0 h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-br from-brandBlue/85 to-slate-900/70" />
+          <div className="relative">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-100">Join ShopVerse</p>
+            <h1 className="mt-2 font-display text-3xl font-extrabold">Create Account</h1>
+            <p className="mt-2 text-blue-100">Sign up once and checkout quickly anytime.</p>
+          </div>
         </div>
 
         <form onSubmit={submit} className="space-y-4 p-8">

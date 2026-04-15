@@ -23,6 +23,8 @@ function Navbar() {
   ];
 
   const selectedCategory = useMemo(() => searchParams.get("category") || "All", [searchParams]);
+  const shortName = user?.fullName ? user.fullName.split(" ")[0] : "My Account";
+  const userMark = shortName.trim().charAt(0).toUpperCase() || "U";
 
   useEffect(() => {
     setSearchText(searchParams.get("q") || "");
@@ -104,9 +106,11 @@ function Navbar() {
           <div className="ml-auto flex items-center gap-2">
             {token ? (
               <>
-                <button className="sv-btn-ghost" onClick={() => navigate("/profile")}
-                >
-                  {user?.fullName ? user.fullName.split(" ")[0] : "My Account"}
+                <button className="sv-btn-ghost gap-2" onClick={() => navigate("/profile")}>
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brandBlue text-[11px] font-bold text-white">
+                    {userMark}
+                  </span>
+                  {shortName}
                 </button>
                 <button className="sv-btn-ghost" onClick={logout}>
                   Logout
