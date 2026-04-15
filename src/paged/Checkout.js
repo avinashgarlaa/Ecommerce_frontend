@@ -28,20 +28,14 @@ function Checkout() {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen p-5">
-
-      <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-5">
-
-        {/* 📝 LEFT: ADDRESS FORM */}
-        <div className="bg-white p-5 rounded shadow">
-
-          <h2 className="text-lg font-bold mb-4">
-            Delivery Address
-          </h2>
+    <div className="mx-auto max-w-6xl p-4 md:p-6">
+      <div className="grid gap-5 md:grid-cols-2">
+        <div className="rounded-sm bg-white p-5 shadow-card">
+          <h2 className="mb-4 text-lg font-bold">Delivery Address</h2>
 
           <textarea
             placeholder="Enter full address (Name, Phone, Address, City, Pincode)"
-            className="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full rounded-sm border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-brandBlue"
             rows={6}
             value={address}
             onChange={(e) => setAddress(e.target.value)}
@@ -51,43 +45,30 @@ function Checkout() {
             onClick={placeOrder}
             disabled={loading}
             className={`
-              w-full mt-4 py-2 rounded text-white
-              ${loading ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"}
+              mt-4 w-full rounded-sm py-3 font-semibold text-white
+              ${loading ? "bg-gray-400" : "bg-orange-500 hover:bg-orange-600"}
             `}
           >
             {loading ? "Placing Order..." : "Place Order"}
           </button>
         </div>
 
-        {/* 💰 RIGHT: SUMMARY */}
-        <div className="bg-white p-5 rounded shadow h-fit">
+        <div className="h-fit rounded-sm bg-white p-5 shadow-card">
+          <h2 className="mb-4 text-lg font-bold">Order Summary</h2>
 
-          <h2 className="text-lg font-bold mb-4">
-            Order Summary
-          </h2>
+          <p className="mb-2 text-gray-600">Secure checkout</p>
 
-          <p className="text-gray-600 mb-2">
-            ✔ Secure Checkout
-          </p>
+          <p className="mb-2 text-gray-600">Fast delivery</p>
 
-          <p className="text-gray-600 mb-2">
-            ✔ Fast Delivery
-          </p>
-
-          <p className="text-gray-600 mb-2">
-            ✔ Cash on Delivery Available
-          </p>
+          <p className="mb-2 text-gray-600">Cash on Delivery available</p>
 
           <hr className="my-4" />
 
-          <p className="text-green-600 font-semibold">
-            You will receive your order within 3-5 days 🚚
+          <p className="font-semibold text-green-700">
+            You will receive your order within 3-5 days.
           </p>
-
         </div>
-
       </div>
-
     </div>
   );
 }

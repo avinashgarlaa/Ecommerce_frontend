@@ -10,12 +10,8 @@ import Success from "./paged/Success";
 function App() {
   return (
     <BrowserRouter>
-
-      {/* ✅ Navbar (shown on all pages) */}
       <Navbar />
-
-      {/* ✅ Main content area */}
-      <div className="bg-gray-100 min-h-screen">
+      <div className="min-h-screen bg-brandGray">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/product/:id" element={<Product />} />
