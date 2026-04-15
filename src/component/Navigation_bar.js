@@ -1,8 +1,13 @@
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const [searchText, setSearchText] = useState(searchParams.get("q") || "");
   const categories = [
+    "All",
     "Mobiles",
     "Fashion",
     "Electronics",
@@ -11,6 +16,40 @@ function Navbar() {
     "Travel",
     "Grocery",
   ];
+
+  const selectedCategory = useMemo(
+    () => searchParams.get("category") || "All",
+    [searchParams]
+  );
+
+  useEffect(() => {
+    setSearchText(searchParams.get("q") || "");
+  }, [searchParams]);
+
+  const onSearchSubmit = (e) => {
+    e.preventDefault();
+    const params = new URLSearchParams(searchParams);
+
+    if (searchText.trim()) {
+      params.set("q", searchText.trim());
+    } else {
+      params.delete("q");
+    }
+
+    const queryString = params.toString();
+    navigate(queryString ? `/?${queryString}` : "/");
+  };
+
+  const onCategorySelect = (category) => {
+    const params = new URLSearchParams(searchParams);
+    if (category === "All") {
+      params.delete("category");
+    } else {
+      params.set("category", category);
+    }
+    const queryString = params.toString();
+    navigate(queryString ? `/?${queryString}` : "/");
+  };
 
   return (
     <div className="sticky top-0 z-20 shadow-card">
@@ -24,11 +63,15 @@ function Navbar() {
             <p className="text-xs text-yellow-100">Explore Plus</p>
           </button>
 
-          <input
-            type="text"
-            placeholder="Search for products, brands and more"
-            className="hidden flex-1 rounded-sm border-none px-4 py-2 text-sm text-gray-700 shadow-sm placeholder:text-gray-500 focus:outline-none md:block"
-          />
+          <form onSubmit={onSearchSubmit} className="hidden flex-1 md:block">
+            <input
+              type="text"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              placeholder="Search for products, brands and more"
+              className="w-full rounded-sm border-none px-4 py-2 text-sm text-gray-700 shadow-sm placeholder:text-gray-500 focus:outline-none"
+            />
+          </form>
 
           <button
             className="rounded-sm bg-white px-6 py-2 text-sm font-semibold text-brandBlue hover:bg-blue-50"
@@ -51,8 +94,12 @@ function Navbar() {
           {categories.map((category) => (
             <button
               key={category}
-              className="whitespace-nowrap hover:text-brandBlue"
-              onClick={() => navigate("/")}
+              className={`whitespace-nowrap ${
+                selectedCategory === category && location.pathname === "/"
+                  ? "text-brandBlue"
+                  : "hover:text-brandBlue"
+              }`}
+              onClick={() => onCategorySelect(category)}
             >
               {category}
             </button>

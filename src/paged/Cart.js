@@ -21,10 +21,20 @@ function Cart() {
     fetchCart();
   };
 
+  const updateQuantity = async (id, currentQty, delta) => {
+    const nextQty = currentQty + delta;
+    if (nextQty < 1) return;
+    await API.patch(`/cart/${id}`, { quantity: nextQty });
+    fetchCart();
+  };
+
   const total = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
+  const discount = Math.round(total * 0.08);
+  const deliveryFee = total > 2000 ? 0 : 99;
+  const payable = total - discount + deliveryFee;
 
   // ❌ Empty cart UI
   if (cart.length === 0) {
@@ -54,11 +64,29 @@ function Cart() {
                 src={item.image_url}
                 alt={item.name}
                 className="h-24 w-24 rounded-sm border border-gray-200 p-2 object-contain"
+                onError={(e) => {
+                  e.currentTarget.src =
+                    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80";
+                }}
               />
 
               <div className="flex-1">
                 <h3 className="font-semibold">{item.name}</h3>
-                <p className="mt-1 text-sm text-gray-500">Qty: {item.quantity}</p>
+                <div className="mt-2 flex items-center gap-2">
+                  <button
+                    className="h-7 w-7 rounded-full border border-gray-300 text-sm font-semibold"
+                    onClick={() => updateQuantity(item.id, item.quantity, -1)}
+                  >
+                    -
+                  </button>
+                  <span className="min-w-6 text-center text-sm font-medium">{item.quantity}</span>
+                  <button
+                    className="h-7 w-7 rounded-full border border-gray-300 text-sm font-semibold"
+                    onClick={() => updateQuantity(item.id, item.quantity, 1)}
+                  >
+                    +
+                  </button>
+                </div>
                 <p className="mt-1 text-lg font-bold text-gray-900">₹{item.price}</p>
 
                 <button
@@ -88,11 +116,21 @@ function Cart() {
             <span>₹{total}</span>
           </div>
 
+          <div className="mb-2 flex justify-between text-green-700">
+            <span>Discount</span>
+            <span>-₹{discount}</span>
+          </div>
+
+          <div className="mb-2 flex justify-between">
+            <span>Delivery Fee</span>
+            <span>{deliveryFee === 0 ? "Free" : `₹${deliveryFee}`}</span>
+          </div>
+
           <hr className="my-3" />
 
           <div className="flex justify-between font-bold">
             <span>Amount Payable</span>
-            <span>₹{total}</span>
+            <span>₹{payable}</span>
           </div>
 
           <button
