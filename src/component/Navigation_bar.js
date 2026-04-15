@@ -6,6 +6,8 @@ function Navbar() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const [searchText, setSearchText] = useState(searchParams.get("q") || "");
+  const token = localStorage.getItem("shopverse_token");
+  const user = JSON.parse(localStorage.getItem("shopverse_user") || "null");
   const categories = [
     "All",
     "Mobiles",
@@ -51,16 +53,27 @@ function Navbar() {
     navigate(queryString ? `/?${queryString}` : "/");
   };
 
+  const logout = () => {
+    localStorage.removeItem("shopverse_token");
+    localStorage.removeItem("shopverse_user");
+    navigate("/login");
+  };
+
   return (
     <div className="sticky top-0 z-20 shadow-card">
       <div className="bg-brandBlue">
         <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 text-white">
           <button
-            className="text-left"
+            className="flex items-center gap-2 text-left"
             onClick={() => navigate("/")}
           >
-            <p className="text-xl font-bold italic leading-none">Flipkart</p>
-            <p className="text-xs text-yellow-100">Explore Plus</p>
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-yellow-300 via-yellow-400 to-orange-500 shadow">
+              <span className="text-sm font-black italic text-brandBlue">SV</span>
+            </div>
+            <div>
+              <p className="text-xl font-bold italic leading-none">ShopVerse</p>
+              <p className="text-xs text-yellow-100">Smart Deals</p>
+            </div>
           </button>
 
           <form onSubmit={onSearchSubmit} className="hidden flex-1 md:block">
@@ -73,12 +86,29 @@ function Navbar() {
             />
           </form>
 
-          <button
-            className="rounded-sm bg-white px-6 py-2 text-sm font-semibold text-brandBlue hover:bg-blue-50"
-            onClick={() => navigate("/checkout")}
-          >
-            Login
-          </button>
+          {token ? (
+            <div className="hidden items-center gap-2 md:flex">
+              <button
+                className="rounded-sm bg-white px-4 py-2 text-sm font-semibold text-brandBlue hover:bg-blue-50"
+                onClick={() => navigate("/checkout")}
+              >
+                {user?.fullName ? user.fullName.split(" ")[0] : "My Account"}
+              </button>
+              <button
+                className="rounded-sm border border-white/40 px-3 py-2 text-xs font-semibold hover:bg-brandBlueDark"
+                onClick={logout}
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <button
+              className="rounded-sm bg-white px-6 py-2 text-sm font-semibold text-brandBlue hover:bg-blue-50"
+              onClick={() => navigate("/login", { state: { from: location.pathname } })}
+            >
+              Login
+            </button>
+          )}
 
           <button
             onClick={() => navigate("/cart")}
