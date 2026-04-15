@@ -53,6 +53,7 @@ function Home() {
     return parts.join(" ");
   }, [category, query]);
   const featuredPicks = useMemo(() => products.slice(0, 4), [products]);
+  const remainingProducts = useMemo(() => products.slice(featuredPicks.length), [products, featuredPicks.length]);
   const valueDeals = useMemo(() => products.filter((item) => Number(item.price) <= 3000).slice(0, 4), [products]);
   const trustPoints = [
     "100% secure checkout",
@@ -164,9 +165,9 @@ function Home() {
         <div className="sv-panel flex min-h-[34vh] items-center justify-center p-6 text-center text-slate-500">
           No products found for the selected filters.
         </div>
-      ) : (
+      ) : remainingProducts.length === 0 ? null : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {products.map((p) => (
+          {remainingProducts.map((p) => (
             <ProductCard key={p.id} product={p} onClick={() => navigate(`/product/${p.id}`)} />
           ))}
         </div>
