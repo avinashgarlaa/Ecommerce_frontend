@@ -12,12 +12,12 @@ function Product() {
 
   useEffect(() => {
     API.get(`/products/${id}`)
-      .then(res => {
+      .then((res) => {
         setProduct(res.data?.data || res.data || {});
         setActiveImageIndex(0);
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
         setLoading(false);
       });
@@ -30,21 +30,25 @@ function Product() {
         product_id: product.id,
         quantity: 1,
       });
-      alert("Added to cart 🛒");
+      alert("Added to cart");
+      return true;
     } catch (err) {
       if (err.response?.status === 401) {
         navigate("/login", { state: { from: `/product/${id}` } });
-        return;
+        return false;
       }
       alert("Unable to add item to cart");
+      return false;
     } finally {
       setAdding(false);
     }
   };
 
   const buyNow = async () => {
-    await addToCart();
-    navigate("/checkout");
+    const added = await addToCart();
+    if (added) {
+      navigate("/checkout");
+    }
   };
 
   const originalPrice = Math.round(Number(product.price || 0) * 1.25);
@@ -63,30 +67,31 @@ function Product() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center text-lg font-medium text-gray-600">
+      <div className="sv-shell flex h-[70vh] items-center justify-center text-lg font-semibold text-slate-600">
         Loading product...
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-7xl p-4 md:p-6">
-      <div className="grid gap-6 rounded-sm bg-white p-5 shadow-card md:grid-cols-2 md:gap-10">
+    <main className="sv-shell animate-floatIn py-5 md:py-7">
+      <div className="sv-panel grid gap-6 p-5 md:grid-cols-2 md:gap-10 md:p-7">
         <div className="grid gap-3 md:grid-cols-[72px_1fr]">
           <div className="flex gap-2 overflow-x-auto md:flex-col">
             {galleryImages.map((url, index) => (
               <button
                 key={`${url}-${index}`}
                 onClick={() => setActiveImageIndex(index)}
-                className={`h-16 w-16 flex-shrink-0 rounded border p-1 ${
-                  index === activeImageIndex ? "border-brandBlue" : "border-gray-200"
+                className={`h-16 w-16 flex-shrink-0 rounded-xl border p-1 transition ${
+                  index === activeImageIndex ? "border-brandBlue bg-blue-50" : "border-slate-200"
                 }`}
               >
-                <img src={url} alt={`${product.name}-${index}`} className="h-full w-full object-contain" />
+                <img src={url} alt={`${product.name}-${index}`} className="h-full w-full rounded-lg object-contain" />
               </button>
             ))}
           </div>
-          <div className="flex items-center justify-center rounded-sm border border-gray-200 p-6">
+
+          <div className="flex items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 p-6">
             <img
               src={activeImage}
               alt={product.name}
@@ -100,61 +105,59 @@ function Product() {
         </div>
 
         <div>
-          <h2 className="text-2xl font-bold">{product.name}</h2>
-          <div className="mt-2 inline-flex items-center gap-2 rounded bg-green-600 px-2 py-1 text-xs font-semibold text-white">
+          <h2 className="font-display text-3xl font-extrabold text-ink">{product.name}</h2>
+
+          <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-green-600 px-3 py-1 text-xs font-semibold text-white">
             <span>{product.rating || 4.0} ★</span>
             <span>{product.review_count || 0} ratings</span>
           </div>
 
-          <p className="mt-2 text-gray-600">{product.description}</p>
+          <p className="mt-3 text-slate-600">{product.description}</p>
 
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <h3 className="text-3xl font-bold text-gray-900">₹{product.price}</h3>
-            <p className="text-lg text-gray-500 line-through">₹{originalPrice}</p>
-            <p className="text-sm font-semibold text-green-700">{discountPercent}% off</p>
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <h3 className="text-4xl font-extrabold text-ink">₹{product.price}</h3>
+            <p className="text-lg text-slate-400 line-through">₹{originalPrice}</p>
+            <p className="rounded-full bg-green-100 px-2 py-0.5 text-sm font-bold text-green-700">
+              {discountPercent}% off
+            </p>
           </div>
 
-          <p className="mt-1 text-sm text-gray-500">Inclusive of all taxes</p>
+          <p className="mt-1 text-sm text-slate-500">Inclusive of all taxes</p>
 
-          <p className="mt-2 font-medium text-green-700">
+          <p className="mt-3 font-semibold text-green-700">
             {product.stock > 0 ? `In Stock (${product.stock} left)` : "Out of Stock"}
           </p>
-          <ul className="mt-3 space-y-1 text-sm text-gray-700">
+
+          <ul className="mt-3 space-y-1 text-sm text-slate-600">
             <li>Free delivery by tomorrow</li>
             <li>7-day easy returns</li>
             <li>Pay on Delivery available</li>
           </ul>
 
-          <div className="mt-5 rounded border border-gray-200 p-3">
-            <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-600">
-              Specifications
-            </h3>
+          <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">Specifications</h3>
             {specs.length > 0 ? (
-              <div className="space-y-1 text-sm text-gray-700">
+              <div className="space-y-1 text-sm text-slate-700">
                 {specs.map(([key, value]) => (
                   <p key={key}>
-                    <span className="font-medium capitalize">{key.replaceAll("_", " ")}:</span>{" "}
+                    <span className="font-semibold capitalize">{key.replaceAll("_", " ")}:</span>{" "}
                     {String(value)}
                   </p>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-500">Specifications not available.</p>
+              <p className="text-sm text-slate-500">Specifications not available.</p>
             )}
           </div>
 
-          <div className="mt-6 flex flex-wrap gap-4">
-            <button
-              onClick={addToCart}
-              disabled={adding || product.stock < 1}
-              className="min-w-36 rounded-sm bg-brandYellow px-6 py-3 font-semibold text-gray-900 hover:brightness-95"
-            >
+          <div className="mt-6 flex flex-wrap gap-3">
+            <button onClick={addToCart} disabled={adding || product.stock < 1} className="sv-btn-accent min-w-36 disabled:cursor-not-allowed disabled:opacity-60">
               {adding ? "Adding..." : "Add to Cart"}
             </button>
 
             <button
-              disabled={product.stock < 1}
-              className="min-w-36 rounded-sm bg-orange-500 px-6 py-3 font-semibold text-white hover:bg-orange-600"
+              disabled={adding || product.stock < 1}
+              className="sv-btn-primary min-w-36 disabled:cursor-not-allowed disabled:opacity-60"
               onClick={buyNow}
             >
               Buy Now
@@ -162,7 +165,7 @@ function Product() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

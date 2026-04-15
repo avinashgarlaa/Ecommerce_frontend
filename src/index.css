@@ -1,14 +1,61 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background-color: #f1f3f6;
-  color: #212121;
+:root {
+  --bg-1: #f4f7fb;
+  --bg-2: #e9f2ff;
+  --ink: #0f172a;
 }
 
 * {
   box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Manrope, system-ui, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 10% 5%, rgba(15, 76, 129, 0.14), transparent 40%),
+    radial-gradient(circle at 88% 12%, rgba(247, 183, 51, 0.2), transparent 45%),
+    linear-gradient(180deg, var(--bg-2), var(--bg-1));
+}
+
+@layer components {
+  .sv-shell {
+    @apply mx-auto max-w-7xl px-4 md:px-6;
+  }
+
+  .sv-panel {
+    @apply rounded-2xl border border-white/60 bg-white/90 shadow-card backdrop-blur-sm;
+  }
+
+  .sv-btn {
+    @apply inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition duration-200;
+  }
+
+  .sv-btn-primary {
+    @apply sv-btn bg-brandBlue text-white hover:bg-brandBlueDark;
+  }
+
+  .sv-btn-accent {
+    @apply sv-btn bg-brandYellow text-ink hover:brightness-95;
+  }
+
+  .sv-btn-ghost {
+    @apply sv-btn border border-slate-300 bg-white text-slate-700 hover:border-brandBlue hover:text-brandBlue;
+  }
+
+  .sv-input {
+    @apply w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 outline-none transition focus:border-brandBlue focus:ring-2 focus:ring-brandBlue/20;
+  }
 }

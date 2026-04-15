@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import API from "../services/api";
 import { useNavigate } from "react-router-dom";
+import API from "../services/api";
 
 function Checkout() {
   const [form, setForm] = useState({
@@ -30,7 +30,7 @@ function Checkout() {
 
   useEffect(() => {
     API.get("/cart")
-      .then((res) => setCartItems(res.data))
+      .then((res) => setCartItems(Array.isArray(res.data) ? res.data : []))
       .catch((err) => console.log(err));
   }, []);
 
@@ -40,25 +40,17 @@ function Checkout() {
   );
   const deliveryFee = subtotal > 2000 ? 0 : subtotal > 0 ? 99 : 0;
   const total = subtotal + deliveryFee;
+  const canPlaceOrder = cartItems.length > 0 && isFormValid() && !loading;
 
   const placeOrder = async () => {
-    if (cartItems.length === 0) {
-      alert("Cart is empty");
-      return;
-    }
-    if (!isFormValid()) {
-      alert("Please fill all delivery details correctly");
-      return;
-    }
+    if (!canPlaceOrder) return;
 
     try {
       setLoading(true);
-
       const res = await API.post("/order", {
         address: form,
         paymentMethod,
       });
-
       navigate(`/success?id=${res.data.orderId}`);
     } catch (err) {
       console.log(err);
@@ -69,47 +61,47 @@ function Checkout() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl p-4 md:p-6">
+    <main className="sv-shell animate-floatIn py-5 md:py-7">
       <div className="grid gap-5 md:grid-cols-2">
-        <div className="rounded-sm bg-white p-5 shadow-card">
-          <h2 className="mb-4 text-lg font-bold">Delivery Address</h2>
+        <section className="sv-panel p-5">
+          <h2 className="font-display mb-4 text-xl font-extrabold text-ink">Delivery Address</h2>
 
           <div className="grid gap-3">
             <input
               placeholder="Full Name"
-              className="w-full rounded-sm border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-brandBlue"
+              className="sv-input"
               value={form.fullName}
               onChange={(e) => updateField("fullName", e.target.value)}
             />
             <input
               placeholder="Phone Number"
-              className="w-full rounded-sm border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-brandBlue"
+              className="sv-input"
               value={form.phone}
               onChange={(e) => updateField("phone", e.target.value)}
             />
             <input
               placeholder="Street Address"
-              className="w-full rounded-sm border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-brandBlue"
+              className="sv-input"
               value={form.street}
               onChange={(e) => updateField("street", e.target.value)}
             />
             <div className="grid grid-cols-2 gap-3">
               <input
                 placeholder="City"
-                className="w-full rounded-sm border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-brandBlue"
+                className="sv-input"
                 value={form.city}
                 onChange={(e) => updateField("city", e.target.value)}
               />
               <input
                 placeholder="State"
-                className="w-full rounded-sm border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-brandBlue"
+                className="sv-input"
                 value={form.state}
                 onChange={(e) => updateField("state", e.target.value)}
               />
             </div>
             <input
               placeholder="Pincode"
-              className="w-full rounded-sm border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-brandBlue"
+              className="sv-input"
               value={form.pincode}
               onChange={(e) => updateField("pincode", e.target.value)}
             />
@@ -117,54 +109,52 @@ function Checkout() {
 
           <button
             onClick={placeOrder}
-            disabled={loading}
-            className={`
-              mt-4 w-full rounded-sm py-3 font-semibold text-white
-              ${loading ? "bg-gray-400" : "bg-orange-500 hover:bg-orange-600"}
-            `}
+            disabled={!canPlaceOrder}
+            className="sv-btn-primary mt-4 w-full disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? "Placing Order..." : "Place Order"}
           </button>
-        </div>
+        </section>
 
-        <div className="h-fit rounded-sm bg-white p-5 shadow-card">
-          <h2 className="mb-4 text-lg font-bold">Order Summary</h2>
+        <aside className="sv-panel h-fit p-5">
+          <h2 className="font-display mb-4 text-xl font-extrabold text-ink">Order Summary</h2>
 
           <div className="space-y-3">
             {cartItems.length === 0 ? (
-              <p className="text-sm text-gray-500">No items in cart.</p>
+              <p className="text-sm text-slate-500">No items in cart.</p>
             ) : (
               cartItems.map((item) => (
                 <div key={item.id} className="flex justify-between text-sm">
-                  <span className="line-clamp-1 text-gray-700">
+                  <span className="line-clamp-1 text-slate-700">
                     {item.name} x {item.quantity}
                   </span>
-                  <span className="font-medium">₹{Number(item.price) * item.quantity}</span>
+                  <span className="font-semibold">₹{Number(item.price) * item.quantity}</span>
                 </div>
               ))
             )}
           </div>
 
-          <hr className="my-4" />
+          <hr className="my-4 border-slate-200" />
+
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-600">Subtotal</span>
+              <span className="text-slate-600">Subtotal</span>
               <span>₹{subtotal}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Delivery</span>
+              <span className="text-slate-600">Delivery</span>
               <span>{deliveryFee === 0 ? "Free" : `₹${deliveryFee}`}</span>
             </div>
-            <div className="flex justify-between text-base font-semibold">
+            <div className="flex justify-between text-base font-extrabold text-ink">
               <span>Total</span>
               <span>₹{total}</span>
             </div>
           </div>
 
           <div className="my-4">
-            <p className="mb-2 text-sm font-semibold text-gray-700">Payment Method</p>
+            <p className="mb-2 text-sm font-bold text-slate-700">Payment Method</p>
             <div className="space-y-2 text-sm">
-              <label className="flex items-center gap-2">
+              <label className="flex items-center gap-2 text-slate-700">
                 <input
                   type="radio"
                   name="payment"
@@ -173,7 +163,7 @@ function Checkout() {
                 />
                 Cash on Delivery
               </label>
-              <label className="flex items-center gap-2">
+              <label className="flex items-center gap-2 text-slate-700">
                 <input
                   type="radio"
                   name="payment"
@@ -185,14 +175,12 @@ function Checkout() {
             </div>
           </div>
 
-          <hr className="my-4" />
+          <hr className="my-4 border-slate-200" />
 
-          <p className="font-semibold text-green-700">
-            You will receive your order within 3-5 days.
-          </p>
-        </div>
+          <p className="font-semibold text-green-700">You will receive your order within 3-5 days.</p>
+        </aside>
       </div>
-    </div>
+    </main>
   );
 }
 

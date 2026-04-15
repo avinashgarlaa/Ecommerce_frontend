@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import API from "../services/api";
 
@@ -10,6 +10,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
 
   const targetPath = location.state?.from || "/";
+  const canSubmit = useMemo(() => email.trim() && password.trim(), [email, password]);
 
   useEffect(() => {
     const token = localStorage.getItem("shopverse_token");
@@ -20,6 +21,8 @@ function Login() {
 
   const submit = async (e) => {
     e.preventDefault();
+    if (!canSubmit) return;
+
     try {
       setLoading(true);
       const res = await API.post("/auth/login", { email, password });
@@ -34,39 +37,44 @@ function Login() {
   };
 
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-96px)] max-w-4xl items-center justify-center p-4">
-      <div className="grid w-full overflow-hidden rounded bg-white shadow-card md:grid-cols-2">
-        <div className="bg-brandBlue p-8 text-white">
-          <h1 className="text-2xl font-bold">Login</h1>
-          <p className="mt-2 text-blue-100">Get access to your Cart, Orders and Wishlist.</p>
+    <main className="sv-shell flex min-h-[calc(100vh-170px)] items-center justify-center py-6">
+      <div className="sv-panel grid w-full max-w-4xl overflow-hidden md:grid-cols-2">
+        <div className="bg-gradient-to-br from-brandBlue to-cyan-600 p-8 text-white">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-100">Welcome Back</p>
+          <h1 className="mt-2 font-display text-3xl font-extrabold">Login</h1>
+          <p className="mt-2 text-blue-100">Access your cart, saved profile, and faster checkout.</p>
         </div>
+
         <form onSubmit={submit} className="space-y-4 p-8">
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
-            className="w-full rounded border border-gray-300 px-3 py-2"
+            className="sv-input"
           />
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
-            className="w-full rounded border border-gray-300 px-3 py-2"
+            className="sv-input"
           />
           <button
-            disabled={loading}
-            className="w-full rounded bg-orange-500 py-2 font-semibold text-white hover:bg-orange-600"
+            disabled={loading || !canSubmit}
+            className="sv-btn-primary w-full disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
-          <p className="text-sm text-gray-600">
-            New user? <Link to="/signup" className="font-semibold text-brandBlue">Create an account</Link>
+          <p className="text-sm text-slate-600">
+            New user?{" "}
+            <Link to="/signup" className="font-bold text-brandBlue">
+              Create an account
+            </Link>
           </p>
         </form>
       </div>
-    </div>
+    </main>
   );
 }
 

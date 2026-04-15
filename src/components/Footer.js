@@ -1,10 +1,10 @@
 function Footer() {
   return (
-    <footer className="mt-10 bg-[#172337] text-gray-300">
-      <div className="mx-auto max-w-7xl px-4 py-8 text-sm">
-        <p className="font-semibold text-white">ShopVerse</p>
-        <p className="mt-2 text-gray-400">
-          Flipkart-inspired demo storefront for learning full-stack commerce architecture.
+    <footer className="mt-10 border-t border-slate-200/70 bg-white/70 backdrop-blur">
+      <div className="sv-shell py-8 text-sm text-slate-600">
+        <p className="font-display text-base font-extrabold text-ink">ShopVerse</p>
+        <p className="mt-2 max-w-2xl">
+          Demo storefront for learning full-stack commerce architecture with a cleaner shopping experience.
         </p>
       </div>
     </footer>

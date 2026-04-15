@@ -10,6 +10,7 @@ function Navbar() {
   const user = JSON.parse(localStorage.getItem("shopverse_user") || "null");
   const isHomePage = location.pathname === "/";
   const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
+
   const categories = [
     "All",
     "Mobiles",
@@ -21,10 +22,7 @@ function Navbar() {
     "Grocery",
   ];
 
-  const selectedCategory = useMemo(
-    () => searchParams.get("category") || "All",
-    [searchParams]
-  );
+  const selectedCategory = useMemo(() => searchParams.get("category") || "All", [searchParams]);
 
   useEffect(() => {
     setSearchText(searchParams.get("q") || "");
@@ -40,26 +38,30 @@ function Navbar() {
       params.delete("q");
     }
 
-    const queryString = params.toString();
     if (!token) {
-      navigate("/login");
+      navigate("/login", { state: { from: "/" } });
       return;
     }
+
+    const queryString = params.toString();
     navigate(queryString ? `/?${queryString}` : "/");
   };
 
   const onCategorySelect = (category) => {
     const params = new URLSearchParams(searchParams);
+
     if (category === "All") {
       params.delete("category");
     } else {
       params.set("category", category);
     }
-    const queryString = params.toString();
+
     if (!token) {
-      navigate("/login");
+      navigate("/login", { state: { from: "/" } });
       return;
     }
+
+    const queryString = params.toString();
     navigate(queryString ? `/?${queryString}` : "/");
   };
 
@@ -70,98 +72,99 @@ function Navbar() {
   };
 
   return (
-    <div className="sticky top-0 z-20 shadow-card">
-      <div className="bg-brandBlue">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 text-white">
+    <header className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/85 backdrop-blur-lg">
+      <div className="sv-shell py-3">
+        <div className="flex flex-wrap items-center gap-3 md:gap-4">
           <button
-            className="flex items-center gap-2 text-left"
+            className="flex items-center gap-2 rounded-xl px-2 py-1 transition hover:bg-slate-100"
             onClick={() => navigate(token ? "/" : "/login")}
+            aria-label="Go to home"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-yellow-300 via-yellow-400 to-orange-500 shadow">
-              <span className="text-sm font-black italic text-brandBlue">SV</span>
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brandBlue via-blue-600 to-cyan-500 text-sm font-extrabold text-white shadow-soft">
+              SV
             </div>
-            <div>
-              <p className="text-xl font-bold italic leading-none">ShopVerse</p>
-              <p className="text-xs text-yellow-100">Smart Deals</p>
+            <div className="text-left">
+              <p className="font-display text-lg font-extrabold leading-none text-ink">ShopVerse</p>
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Premium Deals</p>
             </div>
           </button>
 
           {!isAuthPage && (
-            <form onSubmit={onSearchSubmit} className="hidden flex-1 md:block">
-            <input
-              type="text"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              placeholder="Search for products, brands and more"
-              className="w-full rounded-sm border-none px-4 py-2 text-sm text-gray-700 shadow-sm placeholder:text-gray-500 focus:outline-none"
-            />
+            <form onSubmit={onSearchSubmit} className="order-3 w-full md:order-none md:flex-1">
+              <input
+                type="text"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                placeholder="Search products, brands, categories"
+                className="sv-input"
+              />
             </form>
           )}
 
-          {token ? (
-            <div className="hidden items-center gap-2 md:flex">
+          <div className="ml-auto flex items-center gap-2">
+            {token ? (
+              <>
+                <button className="sv-btn-ghost" onClick={() => navigate("/profile")}
+                >
+                  {user?.fullName ? user.fullName.split(" ")[0] : "My Account"}
+                </button>
+                <button className="sv-btn-ghost" onClick={logout}>
+                  Logout
+                </button>
+              </>
+            ) : (
               <button
-                className="rounded-sm bg-white px-4 py-2 text-sm font-semibold text-brandBlue hover:bg-blue-50"
-                onClick={() => navigate("/profile")}
+                className="sv-btn-primary"
+                onClick={() => navigate("/login", { state: { from: location.pathname } })}
               >
-                {user?.fullName ? user.fullName.split(" ")[0] : "My Account"}
+                Login
               </button>
-              <button
-                className="rounded-sm border border-white/40 px-3 py-2 text-xs font-semibold hover:bg-brandBlueDark"
-                onClick={logout}
-              >
-                Logout
-              </button>
-            </div>
-          ) : (
-            <button
-              className="rounded-sm bg-white px-6 py-2 text-sm font-semibold text-brandBlue hover:bg-blue-50"
-              onClick={() => navigate("/login", { state: { from: location.pathname } })}
-            >
-              Login
-            </button>
-          )}
+            )}
 
-          <button
-            onClick={() => navigate("/cart")}
-            className="rounded-sm border border-white/30 px-4 py-2 text-sm font-semibold hover:bg-brandBlueDark"
-          >
-            Cart
-          </button>
+            <button
+              onClick={() => navigate("/cart")}
+              className="sv-btn-primary"
+            >
+              Cart
+            </button>
+          </div>
         </div>
       </div>
 
-      {isHomePage && token && (
-        <div className="bg-blue-50">
-          <div className="mx-auto flex max-w-7xl items-center gap-6 overflow-x-auto px-4 py-2 text-sm font-medium text-brandBlue">
-            <p className="whitespace-nowrap">Top Deals</p>
-            <p className="whitespace-nowrap">Flash Sale</p>
-            <p className="whitespace-nowrap">Best of Electronics</p>
-            <p className="whitespace-nowrap">Fashion Picks</p>
+      {!isAuthPage && (
+        <div className="border-t border-slate-200/70 bg-white/90">
+          <div className="sv-shell flex items-center gap-2 overflow-x-auto py-2.5">
+            {categories.map((category) => {
+              const active = selectedCategory === category && location.pathname === "/";
+              return (
+                <button
+                  key={category}
+                  className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${
+                    active
+                      ? "bg-brandBlue text-white"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                  onClick={() => onCategorySelect(category)}
+                >
+                  {category}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
 
-      {!isAuthPage && (
-      <div className="bg-white shadow-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-center gap-6 overflow-x-auto px-4 py-2 text-sm font-medium text-gray-700">
-          {categories.map((category) => (
-            <button
-              key={category}
-              className={`whitespace-nowrap ${
-                selectedCategory === category && location.pathname === "/"
-                  ? "text-brandBlue"
-                  : "hover:text-brandBlue"
-              }`}
-              onClick={() => onCategorySelect(category)}
-            >
-              {category}
-            </button>
-          ))}
+      {isHomePage && token && (
+        <div className="border-t border-slate-200/70 bg-gradient-to-r from-white via-blue-50 to-orange-50">
+          <div className="sv-shell flex items-center gap-6 overflow-x-auto py-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+            <p>Top Deals</p>
+            <p>Express Delivery</p>
+            <p>New Launches</p>
+            <p>Verified Sellers</p>
+          </div>
         </div>
-      </div>
       )}
-    </div>
+    </header>
   );
 }
 

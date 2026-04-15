@@ -6,37 +6,19 @@ function Success() {
   const id = query.get("id");
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <div className="max-w-md rounded-sm bg-white p-10 text-center shadow-card">
+    <main className="sv-shell flex min-h-[70vh] items-center justify-center py-6">
+      <div className="sv-panel max-w-md p-10 text-center">
         <div className="mb-4 text-5xl text-green-600">✔</div>
+        <h1 className="font-display text-2xl font-extrabold text-ink">Order Placed Successfully</h1>
+        <p className="mt-3 text-slate-600">Your Order ID is:</p>
+        <p className="mt-1 text-lg font-bold text-brandBlue">#{id}</p>
+        <p className="mt-4 text-slate-500">Your order will be delivered within 3-5 business days.</p>
 
-        <h1 className="text-2xl font-bold text-gray-900">Order Placed Successfully</h1>
-
-        <p className="mt-3 text-gray-600">Your Order ID is:</p>
-
-        <p className="mt-1 text-lg font-semibold text-brandBlue">#{id}</p>
-
-        <p className="mt-4 text-gray-500">
-          Your order will be delivered within 3-5 business days.
-        </p>
-
-        <div className="mt-6 flex justify-center gap-3">
-          <button
-            onClick={() => navigate("/")}
-            className="rounded-sm bg-brandBlue px-5 py-2 text-white hover:bg-brandBlueDark"
-          >
-            Continue Shopping
-          </button>
-
-          <button
-            onClick={() => navigate("/cart")}
-            className="rounded-sm bg-gray-200 px-5 py-2 hover:bg-gray-300"
-          >
-            View Cart
-          </button>
-        </div>
+        <button onClick={() => navigate("/")} className="sv-btn-primary mt-6">
+          Continue Shopping
+        </button>
       </div>
-    </div>
+    </main>
   );
 }
 

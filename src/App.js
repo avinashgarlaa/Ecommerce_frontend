@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import Navbar from "./component/Navigation_bar";
 import ProtectedRoute from "./component/ProtectedRoute";
@@ -22,8 +22,9 @@ function RootEntry() {
 function App() {
   return (
     <BrowserRouter>
-      <Navbar />
-      <div className="min-h-screen bg-brandGray">
+      <div className="min-h-screen">
+        <Navbar />
+
         <Suspense fallback={<Loader label="Preparing your shopping experience..." />}>
           <Routes>
             <Route path="/" element={<RootEntry />} />
@@ -64,9 +65,9 @@ function App() {
             />
           </Routes>
         </Suspense>
+
         <Footer />
       </div>
-
     </BrowserRouter>
   );
 }

@@ -16,48 +16,36 @@ function Profile() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center text-lg text-gray-600">
+      <div className="sv-shell flex h-[65vh] items-center justify-center text-lg font-semibold text-slate-600">
         Loading profile...
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-5xl p-4 md:p-6">
+    <main className="sv-shell animate-floatIn py-5 md:py-7">
       <div className="grid gap-5 md:grid-cols-3">
-        <div className="rounded bg-white p-5 shadow-card">
-          <h2 className="text-lg font-bold">My Profile</h2>
-          <p className="mt-3 text-sm text-gray-500">Name</p>
-          <p className="font-semibold text-gray-900">{profile?.fullName || "Shopper"}</p>
-          <p className="mt-3 text-sm text-gray-500">Email</p>
-          <p className="font-semibold text-gray-900">{profile?.email || "-"}</p>
-        </div>
+        <section className="sv-panel p-5">
+          <h2 className="font-display text-xl font-extrabold text-ink">My Profile</h2>
+          <p className="mt-4 text-xs font-bold uppercase tracking-wider text-slate-500">Name</p>
+          <p className="font-bold text-ink">{profile?.fullName || "Shopper"}</p>
+          <p className="mt-4 text-xs font-bold uppercase tracking-wider text-slate-500">Email</p>
+          <p className="font-bold text-ink">{profile?.email || "-"}</p>
+        </section>
 
-        <div className="rounded bg-white p-5 shadow-card md:col-span-2">
-          <h3 className="text-lg font-bold text-gray-900">Account Actions</h3>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <button
-              onClick={() => navigate("/cart")}
-              className="rounded border border-gray-300 px-4 py-3 text-left hover:border-brandBlue hover:text-brandBlue"
-            >
-              Go to Cart
-            </button>
-            <button
-              onClick={() => navigate("/checkout")}
-              className="rounded border border-gray-300 px-4 py-3 text-left hover:border-brandBlue hover:text-brandBlue"
-            >
-              Continue to Checkout
-            </button>
-            <button
-              onClick={() => navigate("/")}
-              className="rounded border border-gray-300 px-4 py-3 text-left hover:border-brandBlue hover:text-brandBlue"
-            >
+        <section className="sv-panel p-5 md:col-span-2">
+          <h3 className="font-display text-xl font-extrabold text-ink">Quick Actions</h3>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button onClick={() => navigate("/")} className="sv-btn-primary">
               Continue Shopping
             </button>
+            <button onClick={() => navigate("/cart")} className="sv-btn-ghost">
+              Go to Cart
+            </button>
           </div>
-        </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
 

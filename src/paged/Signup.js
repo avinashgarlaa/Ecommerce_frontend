@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import API from "../services/api";
 
@@ -9,6 +9,11 @@ function Signup() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const canSubmit = useMemo(
+    () => fullName.trim() && email.trim() && password.trim().length >= 6,
+    [email, fullName, password]
+  );
+
   useEffect(() => {
     const token = localStorage.getItem("shopverse_token");
     if (token) {
@@ -18,6 +23,8 @@ function Signup() {
 
   const submit = async (e) => {
     e.preventDefault();
+    if (!canSubmit) return;
+
     try {
       setLoading(true);
       const res = await API.post("/auth/signup", { fullName, email, password });
@@ -32,45 +39,50 @@ function Signup() {
   };
 
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-96px)] max-w-4xl items-center justify-center p-4">
-      <div className="grid w-full overflow-hidden rounded bg-white shadow-card md:grid-cols-2">
-        <div className="bg-brandBlue p-8 text-white">
-          <h1 className="text-2xl font-bold">Sign Up</h1>
-          <p className="mt-2 text-blue-100">Create your ShopVerse account in seconds.</p>
+    <main className="sv-shell flex min-h-[calc(100vh-170px)] items-center justify-center py-6">
+      <div className="sv-panel grid w-full max-w-4xl overflow-hidden md:grid-cols-2">
+        <div className="bg-gradient-to-br from-brandBlue to-cyan-600 p-8 text-white">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-100">Join ShopVerse</p>
+          <h1 className="mt-2 font-display text-3xl font-extrabold">Create Account</h1>
+          <p className="mt-2 text-blue-100">Sign up once and checkout quickly anytime.</p>
         </div>
+
         <form onSubmit={submit} className="space-y-4 p-8">
           <input
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             placeholder="Full Name"
-            className="w-full rounded border border-gray-300 px-3 py-2"
+            className="sv-input"
           />
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
-            className="w-full rounded border border-gray-300 px-3 py-2"
+            className="sv-input"
           />
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password (min 6 chars)"
-            className="w-full rounded border border-gray-300 px-3 py-2"
+            className="sv-input"
           />
           <button
-            disabled={loading}
-            className="w-full rounded bg-orange-500 py-2 font-semibold text-white hover:bg-orange-600"
+            disabled={loading || !canSubmit}
+            className="sv-btn-primary w-full disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? "Creating account..." : "Sign Up"}
           </button>
-          <p className="text-sm text-gray-600">
-            Already have an account? <Link to="/login" className="font-semibold text-brandBlue">Login</Link>
+          <p className="text-sm text-slate-600">
+            Already have an account?{" "}
+            <Link to="/login" className="font-bold text-brandBlue">
+              Login
+            </Link>
           </p>
         </form>
       </div>
-    </div>
+    </main>
   );
 }
 

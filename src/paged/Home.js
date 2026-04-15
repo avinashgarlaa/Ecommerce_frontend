@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import API from "../services/api";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import API from "../services/api";
 import ProductCard from "../components/ProductCard";
 import SkeletonCard from "../components/SkeletonCard";
 import useDebounce from "../hooks/useDebounce";
@@ -25,11 +25,11 @@ function Home() {
         sort,
       },
     })
-      .then(res => {
+      .then((res) => {
         setProducts(res.data?.data || res.data || []);
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
         setLoading(false);
       });
@@ -41,63 +41,77 @@ function Home() {
     setSearchParams(params);
   };
 
-  return (
-    <div className="mx-auto max-w-7xl p-4 md:p-6">
-      <div className="mb-5 grid gap-4 md:grid-cols-2">
-        <div className="rounded bg-gradient-to-r from-brandBlue to-brandBlueDark p-6 text-white">
-          <h2 className="text-2xl font-bold">Top Deals For You</h2>
-          <p className="mt-1 text-blue-100">
-            Best prices on trending products with fast delivery and secure checkout.
-          </p>
-        </div>
-        <img
-          src="https://images.unsplash.com/photo-1607082349566-187342175e2f?auto=format&fit=crop&w=1200&q=80"
-          alt="Online shopping banner"
-          className="h-full min-h-28 w-full rounded object-cover"
-        />
-      </div>
+  const subtitle = useMemo(() => {
+    const parts = [];
+    if (query) parts.push(`for "${query}"`);
+    if (category !== "All") parts.push(`in ${category}`);
+    return parts.join(" ");
+  }, [category, query]);
 
-      <div className="mb-4 flex flex-col items-start justify-between gap-2 rounded bg-white p-3 shadow-card md:flex-row md:items-center">
-        <p className="text-sm text-gray-600">
-          {products.length} results
-          {query ? ` for "${query}"` : ""}
-          {category !== "All" ? ` in ${category}` : ""}
+  return (
+    <main className="sv-shell animate-floatIn py-5 md:py-7">
+      <section className="mb-6 grid gap-4 lg:grid-cols-[1.3fr_1fr]">
+        <div className="sv-panel overflow-hidden bg-gradient-to-br from-brandBlue via-blue-700 to-cyan-500 p-6 text-white">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-100">Limited Edition</p>
+          <h1 className="mt-2 font-display text-3xl font-extrabold leading-tight md:text-4xl">
+            Upgrade Your Everyday Shopping
+          </h1>
+          <p className="mt-3 max-w-xl text-sm text-blue-100 md:text-base">
+            Discover handpicked products with honest pricing, quick checkout, and reliable delivery.
+          </p>
+          <button className="sv-btn mt-5 bg-white text-brandBlue hover:bg-blue-50" onClick={() => navigate("/cart")}>
+            Check Cart
+          </button>
+        </div>
+
+        <div className="sv-panel flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+          <img
+            src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1000&q=80"
+            alt="Featured shopping"
+            className="h-40 w-full rounded-2xl object-cover sm:h-28 sm:w-28"
+          />
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">Today Only</p>
+            <h2 className="font-display text-xl font-extrabold text-ink">Save up to 40%</h2>
+            <p className="mt-1 text-sm text-slate-600">Fast-moving deals across electronics, home, and fashion.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="sv-panel mb-5 flex flex-col items-start justify-between gap-3 p-4 md:flex-row md:items-center">
+        <p className="text-sm text-slate-600">
+          <span className="font-bold text-ink">{products.length}</span> results {subtitle}
         </p>
         <div className="flex items-center gap-2 text-sm">
-          <label htmlFor="sortBy" className="text-gray-600">
-            Sort by:
+          <label htmlFor="sortBy" className="font-semibold text-slate-600">
+            Sort by
           </label>
-          <select
-            id="sortBy"
-            value={sort}
-            onChange={(e) => setSort(e.target.value)}
-            className="rounded border border-gray-300 px-2 py-1"
-          >
+          <select id="sortBy" value={sort} onChange={(e) => setSort(e.target.value)} className="sv-input py-2 pr-8">
             <option value="newest">Newest</option>
             <option value="price_asc">Price: Low to High</option>
             <option value="price_desc">Price: High to Low</option>
           </select>
         </div>
-      </div>
+      </section>
 
       {loading ? (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, index) => (
             <SkeletonCard key={index} />
           ))}
         </div>
       ) : products.length === 0 ? (
-        <div className="flex min-h-[35vh] items-center justify-center rounded bg-white p-6 text-gray-500 shadow-card">
-          No products found for selected filters.
+        <div className="sv-panel flex min-h-[34vh] items-center justify-center p-6 text-center text-slate-500">
+          No products found for the selected filters.
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {products.map((p) => (
             <ProductCard key={p.id} product={p} onClick={() => navigate(`/product/${p.id}`)} />
           ))}
         </div>
       )}
-    </div>
+    </main>
   );
 }
 
