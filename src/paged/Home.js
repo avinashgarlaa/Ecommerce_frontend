@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import ProductCard from "../components/ProductCard";
+import SkeletonCard from "../components/SkeletonCard";
+import useDebounce from "../hooks/useDebounce";
 
 function Home() {
   const [products, setProducts] = useState([]);
@@ -11,53 +14,32 @@ function Home() {
   const query = searchParams.get("q") || "";
   const category = searchParams.get("category") || "All";
   const sort = searchParams.get("sort") || "newest";
+  const debouncedQuery = useDebounce(query, 300);
 
   useEffect(() => {
     setLoading(true);
     API.get("/products", {
       params: {
-        q: query || undefined,
+        q: debouncedQuery || undefined,
         category: category === "All" ? undefined : category,
         sort,
       },
     })
       .then(res => {
-        setProducts(res.data);
+        setProducts(res.data?.data || res.data || []);
         setLoading(false);
       })
       .catch(err => {
         console.log(err);
         setLoading(false);
       });
-  }, [query, category, sort]);
+  }, [debouncedQuery, category, sort]);
 
   const setSort = (nextSort) => {
     const params = new URLSearchParams(searchParams);
     params.set("sort", nextSort);
     setSearchParams(params);
   };
-
-  const getOriginalPrice = (price) => Math.round(Number(price) * 1.25);
-  const getDiscountPercent = (price) =>
-    Math.round(((getOriginalPrice(price) - Number(price)) / getOriginalPrice(price)) * 100);
-
-  // 🔄 Loading UI
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center text-lg font-medium text-gray-600">
-        Loading products...
-      </div>
-    );
-  }
-
-  // ❌ Empty state
-  if (products.length === 0) {
-    return (
-      <div className="flex h-screen items-center justify-center text-gray-500">
-        No products available
-      </div>
-    );
-  }
 
   return (
     <div className="mx-auto max-w-7xl p-4 md:p-6">
@@ -98,41 +80,23 @@ function Home() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {products.map((p) => (
-          <div
-            key={p.id}
-            className="cursor-pointer rounded-sm bg-white p-3 shadow-card transition hover:-translate-y-0.5 hover:shadow-lg"
-            onClick={() => navigate(`/product/${p.id}`)}
-          >
-            <div className="h-44 rounded-sm bg-white p-3">
-              <img
-                src={p.image_url}
-                alt={p.name}
-                className="h-full w-full object-contain"
-                onError={(e) => {
-                  e.currentTarget.src =
-                    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80";
-                }}
-              />
-            </div>
-
-            <h3 className="mt-3 min-h-10 text-sm font-semibold text-gray-800">
-              {p.name}
-            </h3>
-
-            <div className="mt-1 flex flex-wrap items-center gap-2">
-              <p className="text-lg font-bold text-gray-900">₹{p.price}</p>
-              <p className="text-sm text-gray-500 line-through">₹{getOriginalPrice(p.price)}</p>
-              <p className="text-xs font-semibold text-green-700">{getDiscountPercent(p.price)}% off</p>
-            </div>
-
-            <p className="text-xs font-medium text-green-700">
-              Free delivery • Cash on Delivery
-            </p>
-          </div>
-        ))}
-      </div>
+      {loading ? (
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <SkeletonCard key={index} />
+          ))}
+        </div>
+      ) : products.length === 0 ? (
+        <div className="flex min-h-[35vh] items-center justify-center rounded bg-white p-6 text-gray-500 shadow-card">
+          No products found for selected filters.
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+          {products.map((p) => (
+            <ProductCard key={p.id} product={p} onClick={() => navigate(`/product/${p.id}`)} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

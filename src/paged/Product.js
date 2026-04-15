@@ -13,7 +13,7 @@ function Product() {
   useEffect(() => {
     API.get(`/products/${id}`)
       .then(res => {
-        setProduct(res.data);
+        setProduct(res.data?.data || res.data || {});
         setActiveImageIndex(0);
         setLoading(false);
       })
