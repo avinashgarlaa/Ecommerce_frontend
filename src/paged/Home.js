@@ -48,6 +48,14 @@ function Home() {
     if (category !== "All") parts.push(`in ${category}`);
     return parts.join(" ");
   }, [category, query]);
+  const featuredPicks = useMemo(() => products.slice(0, 4), [products]);
+  const valueDeals = useMemo(() => products.filter((item) => Number(item.price) <= 3000).slice(0, 4), [products]);
+  const trustPoints = [
+    "100% secure checkout",
+    "Curated quality products",
+    "Fast delivery support",
+    "Easy return policy",
+  ];
 
   return (
     <main className="sv-shell animate-floatIn py-5 md:py-7">
@@ -63,9 +71,14 @@ function Home() {
             <p className="mt-3 max-w-xl text-sm text-blue-100 md:text-base">
               Discover handpicked products with honest pricing, quick checkout, and reliable delivery.
             </p>
-            <button className="sv-btn mt-5 bg-white text-brandBlue hover:bg-blue-50" onClick={() => navigate("/cart")}>
-              Check Cart
-            </button>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <button className="sv-btn bg-white text-brandBlue hover:bg-blue-50" onClick={() => navigate("/cart")}>
+                Check Cart
+              </button>
+              <button className="sv-btn border border-white/60 bg-white/10 text-white hover:bg-white/20" onClick={() => navigate("/?sort=price_desc")}>
+                Shop Premium
+              </button>
+            </div>
           </div>
         </div>
 
@@ -83,12 +96,22 @@ function Home() {
         </div>
       </section>
 
+      <section className="sv-panel mb-5 p-4">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {trustPoints.map((point) => (
+            <div key={point} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700">
+              {point}
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="sv-panel mb-5 flex flex-col items-start justify-between gap-3 p-4 md:flex-row md:items-center">
         <p className="text-sm text-slate-600">
           <span className="font-bold text-ink">{products.length}</span> results {subtitle}
         </p>
-        <div className="flex items-center gap-2 text-sm">
-          <label htmlFor="sortBy" className="font-semibold text-slate-600">
+        <div className="flex flex-nowrap items-center gap-2 text-sm">
+          <label htmlFor="sortBy" className="whitespace-nowrap font-semibold text-slate-600">
             Sort by
           </label>
           <select id="sortBy" value={sort} onChange={(e) => setSort(e.target.value)} className="sv-input py-2 pr-8">
@@ -98,6 +121,22 @@ function Home() {
           </select>
         </div>
       </section>
+
+      {!loading && featuredPicks.length > 0 && (
+        <section className="mb-6">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="font-display text-2xl font-extrabold text-ink">Top Picks This Week</h2>
+            <button className="sv-btn-ghost py-2" onClick={() => navigate("/?sort=newest")}>
+              View latest
+            </button>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {featuredPicks.map((p) => (
+              <ProductCard key={`featured-${p.id}`} product={p} onClick={() => navigate(`/product/${p.id}`)} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {loading ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -115,6 +154,17 @@ function Home() {
             <ProductCard key={p.id} product={p} onClick={() => navigate(`/product/${p.id}`)} />
           ))}
         </div>
+      )}
+
+      {!loading && valueDeals.length > 0 && (
+        <section className="mt-7">
+          <h2 className="mb-3 font-display text-2xl font-extrabold text-ink">Best Value Under ₹3,000</h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {valueDeals.map((p) => (
+              <ProductCard key={`value-${p.id}`} product={p} onClick={() => navigate(`/product/${p.id}`)} />
+            ))}
+          </div>
+        </section>
       )}
     </main>
   );
