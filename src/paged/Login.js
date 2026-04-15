@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import API from "../services/api";
 import { imageAssets } from "../constants/imageAssets";
+import { extractErrorMessage } from "../utils/apiResponse";
 
 function Login() {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ function Login() {
   const [email, setEmail] = useState("default@shopverse.local");
   const [password, setPassword] = useState("password123");
   const [loading, setLoading] = useState(false);
+  const [notice, setNotice] = useState("");
 
   const targetPath = location.state?.from || "/";
   const canSubmit = useMemo(() => email.trim() && password.trim(), [email, password]);
@@ -17,6 +19,12 @@ function Login() {
     const token = localStorage.getItem("shopverse_token");
     if (token) {
       navigate("/", { replace: true });
+      return;
+    }
+
+    if (sessionStorage.getItem("shopverse_session_expired") === "1") {
+      setNotice("Your session expired. Please login again.");
+      sessionStorage.removeItem("shopverse_session_expired");
     }
   }, [navigate]);
 
@@ -26,12 +34,12 @@ function Login() {
 
     try {
       setLoading(true);
-      const res = await API.post("/auth/login", { email, password });
+      const res = await API.post("/auth/login", { email: email.trim(), password });
       localStorage.setItem("shopverse_token", res.data.token);
       localStorage.setItem("shopverse_user", JSON.stringify(res.data.user));
       navigate(targetPath, { replace: true });
     } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
+      alert(extractErrorMessage(err, "Login failed"));
     } finally {
       setLoading(false);
     }
@@ -51,6 +59,11 @@ function Login() {
         </div>
 
         <form onSubmit={submit} className="space-y-4 p-8">
+          {notice && (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-800">
+              {notice}
+            </div>
+          )}
           <input
             type="email"
             value={email}

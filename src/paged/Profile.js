@@ -2,16 +2,24 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import { imageAssets } from "../constants/imageAssets";
+import { extractErrorMessage } from "../utils/apiResponse";
 
 function Profile() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     API.get("/auth/me")
       .then((res) => setProfile(res.data))
-      .catch(() => navigate("/login"))
+      .catch((err) => {
+        if (err?.response?.status === 401) {
+          navigate("/login");
+          return;
+        }
+        setError(extractErrorMessage(err, "Unable to load profile"));
+      })
       .finally(() => setLoading(false));
   }, [navigate]);
 
@@ -19,6 +27,17 @@ function Profile() {
     return (
       <div className="sv-shell flex h-[65vh] items-center justify-center text-lg font-semibold text-slate-600">
         Loading profile...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="sv-shell flex h-[65vh] flex-col items-center justify-center gap-3 text-center">
+        <p className="font-semibold text-red-600">{error}</p>
+        <button className="sv-btn-primary" onClick={() => navigate("/")}>
+          Back to Home
+        </button>
       </div>
     );
   }

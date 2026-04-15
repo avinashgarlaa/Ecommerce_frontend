@@ -7,7 +7,12 @@ function Navbar() {
   const [searchParams] = useSearchParams();
   const [searchText, setSearchText] = useState(searchParams.get("q") || "");
   const token = localStorage.getItem("shopverse_token");
-  const user = JSON.parse(localStorage.getItem("shopverse_user") || "null");
+  let user = null;
+  try {
+    user = JSON.parse(localStorage.getItem("shopverse_user") || "null");
+  } catch (_) {
+    user = null;
+  }
   const isHomePage = location.pathname === "/";
   const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
 

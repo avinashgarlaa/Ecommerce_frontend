@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
+import { extractErrorMessage } from "../utils/apiResponse";
+import { formatCurrencyINR } from "../utils/format";
 
 function Checkout() {
   const [form, setForm] = useState({
@@ -14,6 +16,7 @@ function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState("COD");
   const [loading, setLoading] = useState(false);
   const [cartItems, setCartItems] = useState([]);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const updateField = (field, value) => {
@@ -21,17 +24,23 @@ function Checkout() {
   };
 
   const isFormValid = () =>
-    form.fullName.trim() &&
-    form.phone.trim().length >= 10 &&
-    form.street.trim() &&
-    form.city.trim() &&
-    form.state.trim() &&
-    form.pincode.trim().length >= 6;
+    Boolean(
+      form.fullName.trim() &&
+        /^[0-9]{10}$/.test(form.phone.trim()) &&
+        form.street.trim() &&
+        form.city.trim() &&
+        form.state.trim() &&
+        /^[0-9]{6}$/.test(form.pincode.trim())
+    );
 
   useEffect(() => {
+    setError("");
     API.get("/cart")
       .then((res) => setCartItems(Array.isArray(res.data) ? res.data : []))
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        setError(extractErrorMessage(err, "Unable to load checkout details"));
+      });
   }, []);
 
   const subtotal = useMemo(
@@ -54,7 +63,7 @@ function Checkout() {
       navigate(`/success?id=${res.data.orderId}`);
     } catch (err) {
       console.log(err);
-      alert("Something went wrong");
+      alert(extractErrorMessage(err, "Unable to place order"));
     } finally {
       setLoading(false);
     }
@@ -62,6 +71,11 @@ function Checkout() {
 
   return (
     <main className="sv-shell animate-floatIn py-5 md:py-7">
+      {error && (
+        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+          {error}
+        </div>
+      )}
       <div className="grid gap-5 md:grid-cols-2">
         <section className="sv-panel p-5">
           <h2 className="font-display mb-4 text-xl font-extrabold text-ink">Delivery Address</h2>
@@ -128,7 +142,7 @@ function Checkout() {
                   <span className="line-clamp-1 text-slate-700">
                     {item.name} x {item.quantity}
                   </span>
-                  <span className="font-semibold">₹{Number(item.price) * item.quantity}</span>
+                  <span className="font-semibold">{formatCurrencyINR(Number(item.price) * item.quantity)}</span>
                 </div>
               ))
             )}
@@ -139,15 +153,15 @@ function Checkout() {
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-slate-600">Subtotal</span>
-              <span>₹{subtotal}</span>
+              <span>{formatCurrencyINR(subtotal)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-600">Delivery</span>
-              <span>{deliveryFee === 0 ? "Free" : `₹${deliveryFee}`}</span>
+              <span>{deliveryFee === 0 ? "Free" : formatCurrencyINR(deliveryFee)}</span>
             </div>
             <div className="flex justify-between text-base font-extrabold text-ink">
               <span>Total</span>
-              <span>₹{total}</span>
+              <span>{formatCurrencyINR(total)}</span>
             </div>
           </div>
 

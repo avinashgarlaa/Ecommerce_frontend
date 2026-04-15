@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../services/api";
 import { imageAssets } from "../constants/imageAssets";
+import { extractErrorMessage, unwrapData } from "../utils/apiResponse";
+import { formatCurrencyINR, formatNumberIN } from "../utils/format";
 
 function Product() {
   const { id } = useParams();
@@ -10,16 +12,19 @@ function Product() {
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [error, setError] = useState("");
 
   useEffect(() => {
+    setError("");
     API.get(`/products/${id}`)
       .then((res) => {
-        setProduct(res.data?.data || res.data || {});
+        setProduct(unwrapData(res) || {});
         setActiveImageIndex(0);
         setLoading(false);
       })
       .catch((err) => {
         console.log(err);
+        setError(extractErrorMessage(err, "Unable to load product"));
         setLoading(false);
       });
   }, [id]);
@@ -38,7 +43,7 @@ function Product() {
         navigate("/login", { state: { from: `/product/${id}` } });
         return false;
       }
-      alert("Unable to add item to cart");
+      alert(extractErrorMessage(err, "Unable to add item to cart"));
       return false;
     } finally {
       setAdding(false);
@@ -70,6 +75,17 @@ function Product() {
     return (
       <div className="sv-shell flex h-[70vh] items-center justify-center text-lg font-semibold text-slate-600">
         Loading product...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="sv-shell flex h-[70vh] flex-col items-center justify-center gap-3 text-center">
+        <p className="font-semibold text-red-600">{error}</p>
+        <button className="sv-btn-primary" onClick={() => navigate("/")}>
+          Back to Home
+        </button>
       </div>
     );
   }
@@ -109,14 +125,14 @@ function Product() {
 
           <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-green-600 px-3 py-1 text-xs font-semibold text-white">
             <span>{product.rating || 4.0} ★</span>
-            <span>{product.review_count || 0} ratings</span>
+            <span>{formatNumberIN(product.review_count || 0)} ratings</span>
           </div>
 
           <p className="mt-3 text-slate-600">{product.description}</p>
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            <h3 className="text-4xl font-extrabold text-ink">₹{product.price}</h3>
-            <p className="text-lg text-slate-400 line-through">₹{originalPrice}</p>
+            <h3 className="text-4xl font-extrabold text-ink">{formatCurrencyINR(product.price)}</h3>
+            <p className="text-lg text-slate-400 line-through">{formatCurrencyINR(originalPrice)}</p>
             <p className="rounded-full bg-green-100 px-2 py-0.5 text-sm font-bold text-green-700">
               {discountPercent}% off
             </p>

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import API from "../services/api";
 import { imageAssets } from "../constants/imageAssets";
+import { extractErrorMessage } from "../utils/apiResponse";
 
 function Signup() {
   const navigate = useNavigate();
@@ -28,12 +29,16 @@ function Signup() {
 
     try {
       setLoading(true);
-      const res = await API.post("/auth/signup", { fullName, email, password });
+      const res = await API.post("/auth/signup", {
+        fullName: fullName.trim(),
+        email: email.trim(),
+        password,
+      });
       localStorage.setItem("shopverse_token", res.data.token);
       localStorage.setItem("shopverse_user", JSON.stringify(res.data.user));
       navigate("/");
     } catch (err) {
-      alert(err.response?.data?.message || "Signup failed");
+      alert(extractErrorMessage(err, "Signup failed"));
     } finally {
       setLoading(false);
     }

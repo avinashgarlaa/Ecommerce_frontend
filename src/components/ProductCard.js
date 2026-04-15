@@ -1,4 +1,5 @@
 import { imageAssets } from "../constants/imageAssets";
+import { formatCurrencyINR } from "../utils/format";
 
 function ProductCard({ product, onClick }) {
   const getOriginalPrice = (price) => Math.round(Number(price) * 1.25);
@@ -34,8 +35,8 @@ function ProductCard({ product, onClick }) {
         </div>
 
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          <p className="text-lg font-extrabold text-ink">₹{product.price}</p>
-          <p className="text-sm text-slate-500 line-through">₹{getOriginalPrice(product.price)}</p>
+          <p className="text-lg font-extrabold text-ink">{formatCurrencyINR(product.price)}</p>
+          <p className="text-sm text-slate-500 line-through">{formatCurrencyINR(getOriginalPrice(product.price))}</p>
           <p className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-bold text-green-700">
             {getDiscountPercent(product.price)}% off
           </p>

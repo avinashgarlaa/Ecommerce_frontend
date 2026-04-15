@@ -5,10 +5,12 @@ import ProductCard from "../components/ProductCard";
 import SkeletonCard from "../components/SkeletonCard";
 import useDebounce from "../hooks/useDebounce";
 import { imageAssets } from "../constants/imageAssets";
+import { extractErrorMessage, unwrapData } from "../utils/apiResponse";
 
 function Home() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -19,6 +21,7 @@ function Home() {
 
   useEffect(() => {
     setLoading(true);
+    setError("");
     API.get("/products", {
       params: {
         q: debouncedQuery || undefined,
@@ -27,11 +30,12 @@ function Home() {
       },
     })
       .then((res) => {
-        setProducts(res.data?.data || res.data || []);
+        setProducts(unwrapData(res) || []);
         setLoading(false);
       })
       .catch((err) => {
         console.log(err);
+        setError(extractErrorMessage(err, "Unable to load products right now"));
         setLoading(false);
       });
   }, [debouncedQuery, category, sort]);
@@ -106,7 +110,7 @@ function Home() {
         </div>
       </section>
 
-      <section className="sv-panel mb-5 flex flex-col items-start justify-between gap-3 p-4 md:flex-row md:items-center">
+      <section className="sv-panel mb-5 flex flex-col items-start justify-between gap-3 p-4 sm:flex-row sm:items-center">
         <p className="text-sm text-slate-600">
           <span className="font-bold text-ink">{products.length}</span> results {subtitle}
         </p>
@@ -114,7 +118,12 @@ function Home() {
           <label htmlFor="sortBy" className="whitespace-nowrap font-semibold text-slate-600">
             Sort by
           </label>
-          <select id="sortBy" value={sort} onChange={(e) => setSort(e.target.value)} className="sv-input py-2 pr-8">
+          <select
+            id="sortBy"
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+            className="sv-input w-auto min-w-[170px] py-2 pr-8"
+          >
             <option value="newest">Newest</option>
             <option value="price_asc">Price: Low to High</option>
             <option value="price_desc">Price: High to Low</option>
@@ -143,6 +152,13 @@ function Home() {
           {Array.from({ length: 8 }).map((_, index) => (
             <SkeletonCard key={index} />
           ))}
+        </div>
+      ) : error ? (
+        <div className="sv-panel flex min-h-[34vh] flex-col items-center justify-center gap-3 p-6 text-center">
+          <p className="font-semibold text-red-600">{error}</p>
+          <button className="sv-btn-primary" onClick={() => window.location.reload()}>
+            Retry
+          </button>
         </div>
       ) : products.length === 0 ? (
         <div className="sv-panel flex min-h-[34vh] items-center justify-center p-6 text-center text-slate-500">

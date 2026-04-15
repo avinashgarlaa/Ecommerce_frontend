@@ -6,9 +6,8 @@ const defaultBaseURL =
     : "https://ecommerce-backend-aswj.onrender.com/api";
 
 const API = axios.create({
-  baseURL:
-    process.env.REACT_APP_API_BASE_URL ||
-    defaultBaseURL,
+  baseURL: process.env.REACT_APP_API_BASE_URL || defaultBaseURL,
+  timeout: 15000,
 });
 
 API.interceptors.request.use((config) => {
@@ -18,5 +17,27 @@ API.interceptors.request.use((config) => {
   }
   return config;
 });
+
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+    const isAuthPath = ["/auth/login", "/auth/signup"].some((path) =>
+      String(error?.config?.url || "").includes(path)
+    );
+
+    if (status === 401 && !isAuthPath) {
+      localStorage.removeItem("shopverse_token");
+      localStorage.removeItem("shopverse_user");
+      sessionStorage.setItem("shopverse_session_expired", "1");
+
+      if (window.location.pathname !== "/login") {
+        window.location.assign("/login");
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 export default API;
